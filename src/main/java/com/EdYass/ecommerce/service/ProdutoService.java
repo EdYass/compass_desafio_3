@@ -3,8 +3,10 @@ package com.EdYass.ecommerce.service;
 import com.EdYass.ecommerce.dto.ProdutoDTO;
 import com.EdYass.ecommerce.entity.Produto;
 import com.EdYass.ecommerce.entity.ProdutoStatus;
+import com.EdYass.ecommerce.exception.ProductInUseException;
 import com.EdYass.ecommerce.exception.ProductNotFoundException;
 import com.EdYass.ecommerce.repository.ProdutoRepository;
+import com.EdYass.ecommerce.repository.VendaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,9 @@ import java.util.List;
 public class ProdutoService {
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private VendaRepository vendaRepository;
 
     public List<Produto> getAllProdutos() {
         return produtoRepository.findAll();
@@ -49,17 +54,12 @@ public class ProdutoService {
     @Transactional
     public void deleteProduto(Long id) {
         Produto produto = getProdutoById(id);
-        if (produto.getStatus() == ProdutoStatus.ACTIVE) {
-            produto.setStatus(ProdutoStatus.INACTIVE);
-            produtoRepository.save(produto);
-        } else {
+        if (vendaRepository.existsByProdutosId(id)) {
+            throw new ProductInUseException("Produto já está inserido em uma venda e não pode ser excluído.");
+        }
+        else {
             produtoRepository.delete(produto);
         }
-    }
-
-    public boolean isProdutoAvailable(Long id, int quantity) {
-        Produto produto = getProdutoById(id);
-        return produto.getStock() >= quantity;
     }
 
 }

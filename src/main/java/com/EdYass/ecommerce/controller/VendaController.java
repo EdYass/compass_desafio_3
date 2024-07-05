@@ -47,8 +47,13 @@ public class VendaController {
         return saleService.filterVendasByDate(startDate, endDate);
     }
 
-    @GetMapping("/report")
-    public List<Venda> getVendasReport(@RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
-        return saleService.getVendasReport(startDate, endDate);
+    @GetMapping("/report/weekly")
+    public List<Venda> getWeeklyReport() {
+        return saleService.getWeeklyReport();
+    }
+
+    @GetMapping("/report/monthly")
+    public List<Venda> getMonthlyReport() {
+        return saleService.getMonthlyReport();
     }
 }
