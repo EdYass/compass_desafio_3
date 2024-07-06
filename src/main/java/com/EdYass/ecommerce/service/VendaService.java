@@ -12,6 +12,8 @@ import com.EdYass.ecommerce.repository.VendaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -26,16 +28,19 @@ public class VendaService {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Cacheable(value = "vendas")
     public List<Venda> getAllVendas() {
         return vendaRepository.findAll();
     }
 
+    @Cacheable(value = "venda", key = "#id")
     public Venda getVendaById(Long id) {
         return vendaRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Venda não encontrada"));
     }
 
     @Transactional
+    @CacheEvict(value = {"vendas", "venda"}, allEntries = true)
     public Venda createVenda(VendaDTO vendaDTO) {
         List<Produto> produtos = vendaDTO.getProdutoIds().stream()
                 .map(id -> produtoRepository.findById(id)
@@ -64,6 +69,7 @@ public class VendaService {
     }
 
     @Transactional
+    @CacheEvict(value = {"vendas", "venda"}, allEntries = true)
     public Venda updateVenda(Long id, VendaDTO vendaDTO) {
         Venda venda = getVendaById(id);
 
@@ -102,11 +108,15 @@ public class VendaService {
         return vendaRepository.save(venda);
     }
 
-
-
     @Transactional
+    @CacheEvict(value = {"vendas", "venda"}, allEntries = true)
     public void deleteVenda(Long id) {
         Venda venda = getVendaById(id);
+        venda.getProdutos().forEach(produto -> {
+            produto.setStock(produto.getStock() + 1);
+            produto.setStatus(ProdutoStatus.ACTIVE);
+            produtoRepository.save(produto);
+        });
         vendaRepository.delete(venda);
     }
 

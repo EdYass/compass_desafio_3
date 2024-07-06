@@ -10,6 +10,8 @@ import com.EdYass.ecommerce.repository.VendaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 
@@ -21,16 +23,19 @@ public class ProdutoService {
     @Autowired
     private VendaRepository vendaRepository;
 
+    @Cacheable("produtos")
     public List<Produto> getAllProdutos() {
         return produtoRepository.findAll();
     }
 
+    @Cacheable(value = "produto", key = "#id")
     public Produto getProdutoById(Long id) {
         return produtoRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Produto não encontrado"));
     }
 
     @Transactional
+    @CacheEvict(value = {"produtos", "produto"}, allEntries = true)
     public Produto createProduto(ProdutoDTO produtoDTO) {
         Produto produto = new Produto();
         produto.setNome(produtoDTO.getNome());
@@ -42,6 +47,7 @@ public class ProdutoService {
     }
 
     @Transactional
+    @CacheEvict(value = {"produtos", "produto"}, allEntries = true)
     public Produto updateProduto(Long id, ProdutoDTO produtoDTO) {
         Produto produto = getProdutoById(id);
         produto.setNome(produtoDTO.getNome());
@@ -52,6 +58,7 @@ public class ProdutoService {
     }
 
     @Transactional
+    @CacheEvict(value = {"produtos", "produto"}, allEntries = true)
     public void deleteProduto(Long id) {
         Produto produto = getProdutoById(id);
         if (vendaRepository.existsByProdutosId(id)) {
@@ -61,5 +68,4 @@ public class ProdutoService {
             produtoRepository.delete(produto);
         }
     }
-
 }
