@@ -1,6 +1,6 @@
 package com.EdYass.ecommerce.entity;
 
-public enum ProdutoStatus {
+public enum ProductStatus {
     ACTIVE,
     INACTIVE
 }
