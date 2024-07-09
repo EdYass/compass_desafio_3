@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -171,9 +172,10 @@ public class SaleService {
         return filterSalesByDate(startDate, endDate);
     }
 
-    public List<SaleResponseDTO> getMonthlyReport() {
-        LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minus(1, ChronoUnit.MONTHS);
+    public List<SaleResponseDTO> getMonthlyReport(int year, int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDateTime startDate = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime endDate = yearMonth.atEndOfMonth().atTime(23, 59, 59);
         return filterSalesByDate(startDate, endDate);
     }
 }

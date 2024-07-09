@@ -53,7 +53,7 @@ public class SaleController {
     }
 
     @GetMapping("/report/monthly")
-    public List<SaleResponseDTO> getMonthlyReport() {
-        return saleService.getMonthlyReport();
+    public List<SaleResponseDTO> getMonthlyReport(@RequestParam int year, @RequestParam int month) {
+        return saleService.getMonthlyReport(year, month);
     }
 }
