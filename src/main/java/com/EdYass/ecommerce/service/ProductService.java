@@ -2,7 +2,6 @@ package com.EdYass.ecommerce.service;
 
 import com.EdYass.ecommerce.dto.ProductDTO;
 import com.EdYass.ecommerce.entity.Product;
-import com.EdYass.ecommerce.entity.ProductStatus;
 import com.EdYass.ecommerce.exception.ProductInUseException;
 import com.EdYass.ecommerce.exception.ProductNotFoundException;
 import com.EdYass.ecommerce.repository.ProductRepository;
@@ -42,7 +41,6 @@ public class ProductService {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setStock(productDTO.getStock());
-        product.setStatus(ProductStatus.ACTIVE);
         return productRepository.save(product);
     }
 

@@ -27,12 +27,6 @@ public class Product {
     @Min(value = 0)
     private int stock;
 
-    @Getter
-    @Setter
-    @Enumerated(EnumType.STRING)
-    private ProductStatus status;
-
-
     public @NotBlank String getName() {
         return name;
     }
